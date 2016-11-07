@@ -1,0 +1,4 @@
+<compoundRegex title="metrics">
+  <regex weight="1.0" fields="height">(\d+(?:[,.]\d+)?)\D{0,100}height</regex>
+  <regex weight="1.0" fields="height">height\D{0,100}(\d+(?:[,.]\d+)?)</regex>
+</compoundRegex>
