@@ -12,8 +12,8 @@ Array.prototype.last = function () {
 // END
 
 var project = 'data/0'
-  , output  = 'data/test'
-  , file    = 'data_2'
+  , output  = 'data/0'
+  , file    = 'tables'
   , minify  = false
   
   , outputData = {
@@ -35,21 +35,8 @@ var directories = fs.readdirSync( project )
 for ( var dirIndex = 0; dirIndex < directories.length; dirIndex++ ) {
   
   var directory = directories[ dirIndex ]
-    
-    , metadata = JSON.parse( fs.readFileSync(
-          [ project, directory, 'eupmc_result.json' ].join('/')
-        , 'utf8' )
-      )
-    , tables = getTables( directory )
   
-  outputData.articles[ directory ] = {
-    title    : metadata.title
-  , authors  : metadata.authorString
-  , doi      : metadata.doi
-  , abstract : metadata.abstractText || ''
-  , journal  : metadata.journalInfo[ 0 ].journal[ 0 ].title[ 0 ]
-  , tables   : tables
-  }
+  outputData.articles[ directory ] = getTables( directory )
   
   dirProgress.tick( {
     dir: directory
@@ -68,18 +55,23 @@ function getTables ( dir ) {
     , tables = doc.findall( './/table' )
     
     , out = []
+    
+    , tmpProps
   
   for ( var table of tables ) {
     
-    var data     = []
-      
+    // TODO Make table normalisation program
+    
+    var data     = { type: null, data: [] }
+    
+    // BEGIN PROPS
       , props
       
       , headRows = table.findall( './thead/tr' )
       , mainHeadRow= headRows.shift()
       
     if ( mainHeadRow ) {
-      props = parsePropRow( mainHeadRow._children )
+      props = parsePropRow( mainHeadRow._children, /* Mods: */ true )
       
       headRows.forEach( ( headRow, headRowIndex ) => {
 	var propRow = parsePropRow( headRow._children )
@@ -89,32 +81,44 @@ function getTables ( dir ) {
 	} )
       } )
       
+      // Remove empty mod values
+      props.map( v => {
+	if ( Array.isArray( v.mods ) ) {
+	  v.mods = v.mods.filter( v => Object.keys( v ).length > 0 )
+	  
+	  if ( v.mods.length === 0 )
+	    delete v.mods
+	}
+	return v
+      } )
+      
     } else {
       props = 
 	(
 	  // Last
-	  out.last()
+	  tmpProps
 	||
 	  // or Empty array
-	  { props: [] }
+	  []
 	)
-	  .props
 	  .slice( 0,
 	    table.findall( './/tr' )[ 0 ]._children.length
 	  )
     }
-      
+    // END PROPS
+    
+    // BEGIN VALUES
     table.findall( './tbody/tr' ).forEach( ( bodyRow, bodyRowIndex ) => {
       
       var bodyCells= bodyRow.findall( './td' )
 	, expVals  = props.slice( 1 )
-      
+        
 	, objCell  = bodyCells.shift() || {}
 	, objName  = getText( objCell )
 	, objProps = []
       
       if ( !objName )
-	objName = ( data.last() || { name: '' } ).name
+	objName = ( data.data.last() || { name: '' } ).name
       
       expVals.forEach( ( prop, propIndex ) => {
 	var value = bodyCells[ propIndex ] ?
@@ -126,17 +130,19 @@ function getTables ( dir ) {
 	  name: prop.name
 	, unit: prop.unit
 	, mods: prop.mods
-	, value: value
+	, value: value.trim()
 	} )
       } )
       
-      data.push( {
+      data.data.push( {
 	name: objName
       , props: objProps
       } )
     } )
+    // END VALUES
     
-    data.props = props
+    data.type = props[ 0 ]
+    tmpProps = props.slice( 1 )
     
     out.push( data )
   }
@@ -144,22 +150,30 @@ function getTables ( dir ) {
   return out
 }
 
-function parsePropRow ( row ) {
+function parsePropRow ( row, mods ) {
   var res = []
   
   row.forEach( headCell => {
     var colspan = headCell.attrib.colspan || 1
       , text    = getText( headCell )
       , match   = text.match( /(.+?)(?:\s+\(([^)]+)\)|, (.+)$)?$/ ) || []
-      , name    = match[ 1 ] || ''
-      , unit    = match[ 2 ] || match[ 3 ] || ''
+      , name    = match[ 1 ]
+      , unit    = match[ 2 ] || match[ 3 ]
     
-    while ( colspan-- )
-      res.push( {
-	name: name.trim()
-      , unit: unit.trim()
-      , mods: []
-      } )
+    while ( colspan-- ) {
+      var obj = {}
+      
+      if ( name )
+	obj.name = name.trim()
+      
+      if ( unit )
+	obj.unit = unit.trim()
+      
+      if ( mods )
+	obj.mods = []
+      
+      res.push( obj )
+    }
   } )
   
   return res
@@ -172,7 +186,7 @@ function getText ( elm, bool ) {
   + ( elm._children ? elm._children.map( v => getText( v, true  )).join( '' ) : '' )
   + ( bool ? elm.tail || '' : '' )
 //   + ( bool ? '</' + elm.tag + '>' : '' )
-  ).replace( /\s+/, ' ' )
+  ).replace( /\s+/, ' ' ).trim()
 }
 
 function getJSON ( string ) {

@@ -1,0 +1,26 @@
+{
+  "name": "factvis",
+  "homepage": "contentmine.org",
+  "authors": [
+    "Thomas Arrow <thomasarrow@gmail.com>"
+  ],
+  "description": "Visualisation of ContentMine Facts",
+  "main": "index.html",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "bootstrap-css": "^3.3.6",
+    "wikidata-sdk": "^3.2.4",
+    "datatables": "^1.10.12",
+    "lodash": "^4.16.3",
+    "jquery": "^3.1.1"
+  }
+}

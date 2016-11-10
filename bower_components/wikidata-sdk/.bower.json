@@ -1,0 +1,31 @@
+{
+  "name": "wikidata-sdk",
+  "version": "3.2.4",
+  "homepage": "https://github.com/maxlath/wikidata-sdk",
+  "authors": [
+    "maxlath <k@maxlath.eu>"
+  ],
+  "description": "a javascript tool suite to query and work with wikidata data",
+  "main": "dist/wikidata-sdk.js",
+  "keywords": [
+    "wikidata"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "_release": "3.2.4",
+  "_resolution": {
+    "type": "version",
+    "tag": "v3.2.4",
+    "commit": "6457e9facbfd9e529a6cb7f99060113cf1d8ef56"
+  },
+  "_source": "https://github.com/maxlath/wikidata-sdk.git",
+  "_target": "^3.2.4",
+  "_originalSource": "wikidata-sdk",
+  "_direct": true
+}
