@@ -86,7 +86,7 @@ function checkHash() {
 function loadFile(num) {
 //   var num = $('#sample_number').val() || '1'
   
-  $.get('data/0/facts_'+(num||1)+'.json', function CB_loadDefault(file) {
+  $.get('sample/sample_'+(num||1)+'.json', function CB_loadDefault(file) {
     receivedText(file)
   }).fail((err) => {
     var e = {}
