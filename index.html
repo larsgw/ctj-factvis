@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ContentMine Facts</title>
+    <title>Table Facts</title>
     
     <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&subset=latin,greek,latin-ext' rel='stylesheet' type='text/css'>
     
@@ -30,28 +30,16 @@
     <script src="script.js"></script>
     
     <main>
-      <!--div id="front-loading-matter">
-	<h1>ContentMine Facts Visualiser</h1>
-	Choose a local ContentMine fact dump: (like <a href="https://zenodo.org/search?page=1&size=20&q=contentmine&file_type=json">these</a> on zenodo)
+      <div id="front-loading-matter">
+	<h1>Table Facts Visualiser</h1>
 	<form id="jsonFile" name="jsonFile" enctype="multipart/form-data" method="post">
 	  <fieldset>
-	    <label>
-	      <input placeholder="File" type="text" id="uploadFile" readonly/>
-	      <div>
-		<i class="material-icons">attach_file</i>
-		<input id="fileinput" type="file" onchange="uploadFile.value=this.files[0].name;">
-	      </div>
-	    </label>
-	    <input type='button' id='btnLoad' value='Load' onclick='loadFile();' class="btn btn-primary">
+	    <legend>Load a sample set:</legend>
+	    <input type='button' id='btnLoad' value='Load sample file 1' onclick='loadFile(1);' class="btn btn-primary"><br>
+	    <input type='button' id='btnLoad' value='Load sample file 2' onclick='loadFile(2);' class="btn btn-primary">
 	  </fieldset>
 	</form>
-	  Or just use the a subset of the sample Zika dataset. Full version available from: <a href="https://doi.org/10.5281/zenodo.154505">here</a>
-	<form>
-	  <fieldset>
-	    <input type='button' id='btnDefault' value='Load Zika Facts!' onclick="loadDefault();" class="btn btn-primary">
-	  </fieldset>
-	</form>
-      </div-->
+      </div>
       <header id="desc">
 	<hr>
 	<h1 id="desc-title"></h1>
@@ -98,7 +86,7 @@
 <!--       <p>Port of <a href="https://github.com/tarrow">tarrow</a>'s <a href="http://tarrow.github.io/factvis">page</a></p> -->
       <p class="text-muted credit">The font used is <a href="https://github.com/google/roboto">Roboto</a>, released under <a href="https://github.com/google/roboto/blob/master/LICENSE">Apache 2.0</a>.</p>
       <p class="text-muted credit">The icons used are <a href="https://github.com/google/material-design-icons">Material Design Icons</a>, released under <a href="https://github.com/google/material-design-icons/blob/master/LICENSE">Apache 2.0</a>.</p>
-      <p class="text-muted credit">The W icon (<img src="W_icon.png"/>) for links to Wikipedia is a trademark of and authored by the Wikimedia Foundation. It is released under a CC BY-SA 3.0 license</p>
+<!--       <p class="text-muted credit">The W icon (<img src="W_icon.png"/>) for links to Wikipedia is a trademark of and authored by the Wikimedia Foundation. It is released under a CC BY-SA 3.0 license</p> -->
     </footer>
     
   </body>

@@ -83,18 +83,10 @@ function checkHash() {
 //   return colors[colormap[dictionary]]
 // }
 
-// function loadFile() {
-//   if (load) {
-//     var input = document.getElementById('fileinput');
-//     var file = input.files[0];
-//     var fr = new FileReader();
-//     fr.onload = receivedText;
-//     fr.readAsText(file);
-//   } load = false
-// }
-
-function loadDefault() {
-  $.get('data/0/facts_1.json', function CB_loadDefault(file) {
+function loadFile(num) {
+//   var num = $('#sample_number').val() || '1'
+  
+  $.get('data/0/facts_'+(num||1)+'.json', function CB_loadDefault(file) {
     receivedText(file)
   }).fail((err) => {
     var e = {}
@@ -103,6 +95,17 @@ function loadDefault() {
     receivedText(e)
   })
 }
+
+/*function loadDefault() {
+  $.get('data/0/facts_1.json', function CB_loadDefault(file) {
+    receivedText(file)
+  }).fail((err) => {
+    var e = {}
+    e.target = {}
+    e.target.result = err.responseText
+    receivedText(e)
+  })
+}*/
 
 function receivedText(e) {
   lines = e.target.result.split('\n');
@@ -119,9 +122,6 @@ function receivedText(e) {
       
       if (obj._source.prop.unit)
 	obj._source.prop.unit = _.escape( obj._source.prop.unit )
-
-      if ( line < 10 )
-	console.log(obj)
       
       newArr.push(obj)
     } catch(e) {
@@ -217,7 +217,12 @@ function receivedText(e) {
 	( value._source.identifiers.article.name ? value._source.identifiers.article.name : '' ) +
       '">'+ value._source.term + '</td>' +
       
-      '<td class="prop"><span>'+ value._source.prop.name+'</td>' +
+      '<td class="prop"><span>' +
+	value._source.prop.name +
+	( Array.isArray(value._source.prop.mods) ?
+	  ' (' + value._source.prop.mods.map(function(v){return _.escape(v.name)}).join(', ') + ')'
+	: '' ) +
+      '</td>' +
       
       '<td class="value"><span data-unit="'+
 	( value._source.prop.unit ? value._source.prop.unit : '' ) +
@@ -265,4 +270,4 @@ function receivedText(e) {
   clearFilter()
 }
 
-$(loadDefault)
+// $(loadDefault)
