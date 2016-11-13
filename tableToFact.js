@@ -1,4 +1,5 @@
 var fs      = require( 'fs'         )
+  , HashMap = require( 'hashmap'    )
   
   , progress= require( 'progress'   )
               require( 'colors'     )
@@ -14,8 +15,10 @@ var project = 'data/0'
   , file    = 'facts'
   , minify  = true
   
-  , factID  = 'aaaaaaaaaa'
+  , factID  = fs.readFileSync( [ project, 'factID.txt' ].join( '/' ), 'utf8' )
   , abc     = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_'
+  
+  , spcsRgx = /^([A-Z](?:[a-z]+|\.) [a-z]+).*$/
   
   , outputData = []
 
@@ -70,11 +73,22 @@ main:
     data._source.documentID = docID
     
     for ( var table of dir ) {
-      data._source.identifiers.article = table.type
-      
       for ( var object of table.data ) {
 	data._id = incrementFactID()
-	data._source.term = object.name
+	data._source.exact = object.name
+	
+	var speciesMatch = object.name.match( spcsRgx )
+	
+	data._source.term = speciesMatch ?
+	  speciesMatch[ 1 ]
+	:
+	  object.name
+	
+	if ( !!table.type )
+	  object.props.push( {
+	      name: 'instance of'
+	    , value: table.type.name + ( table.type.unit ? ', ' + table.type.unit + '' : '' )
+	  } )
 	
 	for ( var prop of object.props ) {
 	  var fact = JSON.parse( JSON.stringify( data ) )
@@ -82,12 +96,8 @@ main:
 	  
 	  delete prop.value
 	  
-	  /*prop.identifiers = {
-	    wikidata: wdid
-	  }*/
-	  
 	  if ( prop.hasOwnProperty( 'unit' ) )
-	    prop.unit = prop.unit.replace( /([A-Za-z])(.?\d+)/, '$1<sup>$2</sup>' )
+	    prop.unit = prop.unit.replace( /([A-Za-z])(.?\d+)/g, '$1<sup>$2</sup>' )
 	  
 	  fact._source.prop = prop
 	  fact._source.value= value
@@ -114,15 +124,22 @@ function getJSON ( string ) {
 try {
   console.log( 'Saving output...' )
   
+  /**/
   var cap = 5000
   
   for ( var i = 0; i < Math.ceil( outputData.length/cap ); i++ ) {
     var string = outputData.slice( i * cap, ( i + 1 ) * cap ).map( getJSON ).join( '\n' )
-    fs.writeFileSync( [ output, file + '_' + ( i + 1 ) + '.json' ].join( '/' ), string )
+    fs.writeFileSync(
+      [ output, file + '_' + ( i + 1 ) + ( minify ? '.min' : '' ) + '.json' ].join( '/' )
+    , string
+    )
   }
   
-  /*var string = outputData.slice( 0, 500 ).map( getJSON ).join( '\n' )
-  fs.writeFileSync( [ output, file + '_' + 0 + '.json' ].join( '/' ), string )*/
+  //var string = outputData.slice( 0, 500 ).map( getJSON ).join( '\n' )
+  //fs.writeFileSync( [ output, file + '_' + 0 + '.json' ].join( '/' ), string )
+  
+  fs.writeFileSync( [ project, 'factID.txt' ].join( '/' ), factID )
+  /**/
   
   console.log( 'Saving output succeeded!' )
 } catch ( e ) {

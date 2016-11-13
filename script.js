@@ -2,14 +2,18 @@ var table
   , hash  = getHash()
   
   , colormap = {}
-  , column= [ 'pmid', 'term', 'prop', 'value', 'ftid' ]
+  , column= [ 'pmid', 'term', 'prop', 'value', 'wdid', 'ftid' ]
   , desc  = {
     pmid: function (title) {return(
-      '<strong>'+title + '</strong> is an article identifier issued by <a href="https://www.ncbi.nlm.nih.gov/pmc/">Pubmed Central</a>. '+
+      '<strong>' + title + '</strong> is an article identifier issued by <a href="https://www.ncbi.nlm.nih.gov/pmc/">Pubmed Central</a>. '+
       '<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/' + title + '">Here\'s the article</a>'
     )}
+  , wdid: function (title) {return(
+      '<strong>' + title + '</strong> is an object identifier issued by <a href="https://wikidata.org">Wikidata</a>. ' +
+      '<a href="https://wikidata.org/wiki/' + title + '">Here\'s the object</a>'
+    )}
   , ftid: function (title) {return(
-      '<strong>'+title + '</strong> is a fact identifier issued by the <a href="http://contentmine.org">ContentMine</a>.'
+      '<strong>' + title + '</strong> is a fact identifier issued by the <a href="http://contentmine.org">ContentMine</a>.'
     )}
   }
 
@@ -54,6 +58,11 @@ function checkHash() {
     , value = hash.key
     
       if ( title ) text = desc[ 'pmid' ]( title )
+    } else if ( /^Q\d+$/.test( hash.key ) ) {
+      index = column.indexOf( 'wdid' )
+    , value = hash.key
+    
+      if ( title ) text = desc[ 'wdid' ]( title )
     } else {
       columns = false
       table.columns( 1, 2, 3 ).search( hash.key )
@@ -72,20 +81,8 @@ function checkHash() {
   table.draw()
 }
 
-// function getColorNumber (cmid) {
-//   var dictionary = cmid.split('.')[1].split(/[0-9]/)[0]
-//   if (!(dictionary in colormap)) {
-//     var newColorValue=Math.max(1, ... _.values(colormap))+1
-//     if (Number.isInteger(newColorValue)) {
-//       colormap[dictionary] = newColorValue
-//     }
-//   }
-//   return colors[colormap[dictionary]]
-// }
-
 function loadFile(num) {
-//   var num = $('#sample_number').val() || '1'
-  
+  console.log(num)
   $.get('sample/sample_'+(num||1)+'.json', function CB_loadDefault(file) {
     receivedText(file)
   }).fail((err) => {
@@ -95,17 +92,6 @@ function loadFile(num) {
     receivedText(e)
   })
 }
-
-/*function loadDefault() {
-  $.get('data/0/facts_1.json', function CB_loadDefault(file) {
-    receivedText(file)
-  }).fail((err) => {
-    var e = {}
-    e.target = {}
-    e.target.result = err.responseText
-    receivedText(e)
-  })
-}*/
 
 function receivedText(e) {
   lines = e.target.result.split('\n');
@@ -125,20 +111,11 @@ function receivedText(e) {
       
       newArr.push(obj)
     } catch(e) {
-//       console.log(e)
+      console.log(e)
     }
   }
   
   var html = ''
-  
-  /*function contentmineID (cmid) {
-    return (
-      '<a href="#cmid='+cmid+'">'+
-	'<div class="icon"></div>' +
-	'<span>' + cmid + '</span>' +
-      '</a>'
-    )
-  }*/
   
   function factID ( ftid ) {
     return (
@@ -147,75 +124,16 @@ function receivedText(e) {
       '</span></a>'
     )
   }
-  
-  /*function wikidataID (wid) {
-    if (wid)
-      return ( '<a href="#wdid='+wid+'">'+wid+'</a>' )
-    else
-      return ''
-  }
-  
-  function removeXML (str) {
-    return str/*.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&?(#x)?.+?;/g,'')*//*.replace(
-      /^[^<]*>|<.+?>|<[^>]*$/g,
-      ' '
-    )
-  }
-
-  function prependEnWiki (name) {
-    return 'https://en.wikipedia.org/wiki/'+name
-  }
-
-  //return the value of the property of the string name if the target is an item
-  function returnTargetOfProperty (response, wid, pid, cb) {
-    try {
-      var target = response.entities[wid].claims[pid][0].mainsnak.datavalue.value.amount
-      if(response.entities[wid].claims[pid][0].mainsnak.datatype == "wikibase-item") {
-
-      }
-      cb(target)
-    }
-    catch (err) {}
-  }
-
-  function getWikiBaseItem (wid, cb) {
-    $.ajax({
-      url: wdk.getEntities(wid),
-      jsonp: "callback",
-      dataType: "jsonp",
-      success: cb
-    })
-  }*/
-
-  function createdRowFunc (row, data, dataIndex) {
-//     var color = getColorNumber(data[0])
-//     $(row).find('td.cmid .icon').css('background-color', color)
-//     var wid = $(data[5]).text()
-//     if (wid) {
-//       getWikiBaseItem(wid, function (response) {
-// 	  var title = response.entities[wid].sitelinks.enwiki.title
-// 	  if (title) {
-// 	    var url = prependEnWiki(title)
-// 	    var html = ` <a href="${url}"><img src="W_icon.png" alt="wikipedia_icon"</a>`//
-// 	    $(row).find('td.term').append(html)
-// 	  }
-// 	  returnTargetOfProperty(response, wid, 'P1082', function (target) {
-// 	    if (target) $(row).find('td.term img').attr('title',`Population of: ${target}`)
-// 	  })
-// 	})
-//     }
-  }
 
   $('#front-loading-matter').css('display', 'none')
 
-  $.each(newArr, function CB_eachFact(index, value) {
+  newArr.forEach( function CB_eachFact(value, index) {
+    if(value._source.term==='Larix olgensis')console.log(value)
     html +=
     '<tr>' +
       '<td class="pmid"><span><a href="#pmid='+value._source.cprojectID+'">'+ value._source.cprojectID+'</td>' +
       
-      '<td class="term"><span data-type="' +
-	( value._source.identifiers.article.name ? value._source.identifiers.article.name : '' ) +
-      '">'+ value._source.term + '</td>' +
+      '<td class="term"><span>' + value._source.term + '</td>' +
       
       '<td class="prop"><span>' +
 	value._source.prop.name +
@@ -228,6 +146,16 @@ function receivedText(e) {
 	( value._source.prop.unit ? value._source.prop.unit : '' ) +
       '">' + value._source.value + '</td>' +
       
+      '<td class="wdid"><span>' +
+	( typeof value._source.identifiers.wikidata === 'string' ?
+	  '<a href="#wdid=' + value._source.identifiers.wikidata + '">' +
+	  value._source.identifiers.wikidata +
+	  '</a>'
+	:
+	  ''
+	) +
+      '</span></td>' +
+      
       '<td class="ftid"><span>'+ factID(value._id) +'</td>' +
     '</tr>';
   })
@@ -239,13 +167,13 @@ function receivedText(e) {
   } else {
     table = $('#mytable').DataTable( {
       ordering  : true
-    , order     : [ [ 0, 'asc' ], [ 4, 'asc' ] ]
-//     , createdRow: createdRowFunc
+    , order     : [ [ 0, 'asc' ], [ 5, 'asc' ] ]
     , autoWidth : false
     , columnDefs: [
 	{ targets: 0, width: '110px' }
-      , { targets: 1, width: '300px' }
-      , { targets: 2, width: '200px' }
+      , { targets: 1, width: '200px' }
+      , { targets: 2, width: '160px' }
+      , { targets: 4, width: '100px' }
       ]
     , search: {
 	caseInsensitive: false
@@ -267,7 +195,5 @@ function receivedText(e) {
     ' <button onclick="clearFilter()">Clear Filter</button>'
   )
   
-  clearFilter()
+  checkHash()
 }
-
-// $(loadDefault)

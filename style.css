@@ -155,17 +155,19 @@ body > footer {
 /*BEGIN*/
 /* Term */
 td.term { text-align:center; }
-td.term span:after { content: '(' attr('data-type') ')';margin-left:1em; }
 
 /* Prop */
 td.prop { text-align:center; }
 
 /* Term */
 td.value { text-align:center;font-weight:bold; }
-td.value span:after { content: '(' attr('data-unit') ')';margin-left:1em; }
+td.value span:after { content: ', ' attr('data-unit') ;margin-left:1em; }
 
 /* PMID */
 td.pmid { text-align:center; }
+
+/* WDID */
+td.wdid { text-align:center; }
 
 /* Fact */
 tr      { position:relative; }

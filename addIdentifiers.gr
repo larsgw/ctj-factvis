@@ -1,0 +1,49 @@
+import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
+import static groovy.json.JsonOutput.*
+
+Map<String,String> species = new HashMap();
+
+def csvFile = new File( 'dict/species.csv' ).text
+
+csvFile.splitEachLine( ',' ) { fields ->
+  species << [ ( fields[ 1 ] ) : fields[ 0 ] ]
+  species << [ ( fields[ 1 ].replaceFirst( /^([A-Z])[a-z]* ([a-z]+)$/, '$1. $2' ) ) : fields[ 0 ] ]
+}
+
+def basedir = new File( 'data/0' )
+files = basedir.listFiles().grep( ~/.*\/facts_(\d+)\.min\.json/ )
+
+for (currentFile in files) { 
+  def num = ( currentFile =~ /^.*\/facts_(\d+)\.min\.json$/ )[ 0 ][ 1 ]
+  
+  def factFile = currentFile
+
+  def JSON = new JsonSlurper()
+  def factJSON = []
+
+  factFile.eachLine { it ->
+    factJSON.push(JSON.parseText( it ))
+  }
+
+  def newJSON = []
+
+  factJSON.each { it ->
+    def value = species.get( it._source.term )
+    
+    if ( value != null ) {
+      it._source.identifiers.wikidata = value
+    } else {
+      it._source.term = it._source.exact
+    }
+    newJSON.push(it)
+  }
+
+  def saveFile = new File( 'data/0/facts_id_' + num + '.min.json' )
+  saveFile.text = ""
+
+  factJSON.each { it ->
+    def json = JsonOutput.toJson(it)
+    saveFile.append(json+'\n')
+  }
+}
