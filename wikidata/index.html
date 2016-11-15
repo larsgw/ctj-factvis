@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Adding WikiData Statement</title>
+    
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&subset=latin,greek,latin-ext' rel='stylesheet' type='text/css'>
+    
+    <link href="../style.css" rel="stylesheet">
+  </head>
+  <body onload="main()">
+    <header></header>
+    
+    <main>
+      <header>
+	<nav>
+	  <ol>
+	    <li>Check article</li>
+	    <li>Link object</li>
+	    <li>Link property</li>
+	    <li>Link value</li>
+	    <li>Check statement</li>
+	    <li>Add statement</li>
+	  </ol>
+	</nav>
+      </header>
+      <section>
+	<form>
+	  <h1>Check article</h1>
+	  
+	  <p>To add a statement to Wikidata, you need a reference. This is easy when the article the statement exists in Wikidata. Click <strong>Check</strong></p>
+	  
+	  <button class="flat pointer" data-attr="onclick,
+	    load(this);
+	    check(this,'+$_source.cprojectID+');
+	    return false;
+	  ">Check</button>
+	  
+	</form>
+      </section>
+    </main>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

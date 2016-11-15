@@ -87,7 +87,8 @@ main:
 	if ( !!table.type )
 	  object.props.push( {
 	      name: 'instance of'
-	    , value: table.type.name + ( table.type.unit ? ', ' + table.type.unit + '' : '' )
+	    , value: table.type.name
+	    , unit: table.type.unit
 	  } )
 	
 	for ( var prop of object.props ) {
