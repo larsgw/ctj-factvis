@@ -65,8 +65,10 @@ form {
 
 div.loader {
   display:inline-block;
-  width:32px;height:32px;
-/*   background-image:url('../spinner.gif'); */
+  width:24px;height:24px;
+  padding:6px;
+  background:url('spinner.gif') 4px 4px/24px 24px no-repeat;
+  vertical-align:middle;
 }
 
 /*BEGIN Stepper header */
@@ -77,6 +79,7 @@ body > main > section {
 }
 
   body > main > section > form { margin: 0; }
+  body > main > section > form .response { margin:1em 0; }
 
 body > main > header {
   position:relative;

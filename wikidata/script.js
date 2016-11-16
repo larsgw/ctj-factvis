@@ -1,3 +1,5 @@
+var d
+
 function main () {
   var u = window
 	    .location
@@ -9,11 +11,12 @@ function main () {
 	    .slice( 1 )
 	    .join( '?' )
     
-    , d = JSON.parse( decodeURIComponent(escape( atob( u ) )) )
+     
+  d = JSON.parse( decodeURIComponent(escape( atob( u ) )) )
   
   $( 'body > main > section > form [data-replace]' ).each( ( _, v ) => {
     v = $( v )
-    v.html( get( d, v.data( 'replace' ) ) )
+    v.html( getText( d, v.data( 'replace' ) ) )
   } )
   
   $( 'body > main > section > form [data-attr]' ).each( ( _, v ) => {
@@ -21,12 +24,27 @@ function main () {
     var i = v.data( 'attr' ).split( ',' )
     v.attr(
       i.shift(),
-      i.join( ',' )
-	.split( '+' )
-	.map( v => v.charAt( 0 ) === '$' ? get( d, v.slice( 1 ) ) : v )
-	.join( '' )
+      getText( d, i.join( ',' ) )
     )
   } )
+  
+  goto( 1 )
+}
+
+function goto ( n ) {
+  var c = $( 'body > main > section > form.active' )
+            .removeClass( 'active' )
+            .addClass( 'complete' )
+            .parent()
+            .find( ':nth-child(' + n + ')' ) 
+              .addClass( 'active' )
+    , l = c.data( 'load' )
+  
+  check( c, l, false )
+}
+
+function clean ( s ) {
+  return s.trim().replace( /\s+/, ' ' )
 }
 
 function get ( o, n ) {
@@ -37,8 +55,32 @@ function get ( o, n ) {
   return r[ l ]
 }
 
-function check ( e, p ) {
-  console.log( p )
+function getText ( o, s ) {
+  return clean( s )
+    .split( '+' )
+    .map( v => v.charAt( 0 ) === '$' ? get( o, v.slice( 1 ) ) : v )
+    .join( '' )
+}
+
+function check ( e, p, l ) {
+  if ( l )
+    load( e )
+  
+  setTimeout( function do_callback () {
+    var b = true
+      , c = Object.assign( {}, d, { r: { id: p } } )
+      , a = ( $( e ).data( 'response' ) || '' ).split( ',' )
+      , r = a.shift( '' )
+      , s = a.join( ',' ).split( ':' )
+    
+        s = s[ !b ] || s[ 0 ]
+    
+    $( '#' + r ).html( getText( c, s ) )
+    
+    if ( l )
+      unload( e )
+    
+  }, 1000 )
 }
 
 function loader () {

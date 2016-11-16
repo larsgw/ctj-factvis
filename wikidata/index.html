@@ -23,17 +23,21 @@
 	  </ol>
 	</nav>
       </header>
-      <section>
+      <section data-load="
+	    check(this,'+$_source.cprojectID+');
+	  " data-response="s1-r1,
+        $r.id+ exists <a href=''>here</a>. Click <strong>Complete</strong>
+      :
+        The article was not found. <a href=''>Open in SourceMD.</a>
+      ">
 	<form>
 	  <h1>Check article</h1>
 	  
-	  <p>To add a statement to Wikidata, you need a reference. This is easy when the article the statement exists in Wikidata. Click <strong>Check</strong></p>
+	  <p>To add a statement to Wikidata, you need a reference. This is easy when the article the statement exists in Wikidata.</p>
 	  
-	  <button class="flat pointer" data-attr="onclick,
-	    load(this);
-	    check(this,'+$_source.cprojectID+');
-	    return false;
-	  ">Check</button>
+	  <div id="s1-r1" class="response"></div>
+	  
+	  <button onclick="goto(2);return false" class="flat pointer">Complete</button>
 	  
 	</form>
       </section>
