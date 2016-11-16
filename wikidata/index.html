@@ -23,21 +23,64 @@
 	  </ol>
 	</nav>
       </header>
-      <section data-load="
-	    check(this,'+$_source.cprojectID+');
-	  " data-response="s1-r1,
-        $r.id+ exists <a href=''>here</a>. Click <strong>Complete</strong>
-      :
-        The article was not found. <a href=''>Open in SourceMD.</a>
-      ">
-	<form>
+      <section>
+	<form data-load="s1-l1,
+	  $_source.cprojectID
+	" data-response="s1-r1,
+	  $r.id+ exists <a href=''>here</a>. Click <strong>Complete</strong>
+	|
+	  The article was not found. <a href=''>Open in SourceMD.</a>
+	">
 	  <h1>Check article</h1>
 	  
 	  <p>To add a statement to Wikidata, you need a reference. This is easy when the article the statement exists in Wikidata.</p>
 	  
+	  <div id="s1-l1"></div>
 	  <div id="s1-r1" class="response"></div>
 	  
-	  <button onclick="goto(2);return false" class="flat pointer">Complete</button>
+	  <button type="button" onclick="goto(2)" class="flat pointer">Complete</button>
+	  
+	</form>
+	<form data-load="s2-l1,
+	  $_source.identifiers
+	" data-response="s2-r1,
+	  $_source.term+ exists <a href=''>here</a>. Click <strong>Complete</strong>
+	|
+	  <p>The object has no id. Please enter one:</p>
+	  <p><label><input id='s2-t1' type='text' placeholder='Wikidata ID' /></label></p>
+	">
+	  <h1>Link object</h1>
+	  
+	  <p></p>
+	  
+	  <div id="s2-l1"></div>
+	  <div id="s2-r1" class="response"></div>
+	  
+	  <button type="button" onclick="if(object($id('s2-t1').val()))goto(3)" class="flat pointer">Complete</button>
+	  
+	</form>
+	<form>
+	  <h1>Link property</h1>
+	  
+	  <button type="button" onclick="goto(4)" class="flat pointer">Complete</button>
+	  
+	</form>
+	<form>
+	  <h1>Link value</h1>
+	  
+	  <button type="button" onclick="goto(5)" class="flat pointer">Complete</button>
+	  
+	</form>
+	<form>
+	  <h1>Check statement</h1>
+	  
+	  <button type="button" onclick="goto(6)" class="flat pointer">Complete</button>
+	  
+	</form>
+	<form>
+	  <h1>Add statement</h1>
+	  
+	  <button type="button" onclick="finish()" class="flat pointer">Complete</button>
 	  
 	</form>
       </section>
