@@ -48,9 +48,15 @@ function goto ( n ) {
     check( c )
 }
 
-function object ( v ) {
-  console.log(v)
-  return !!v
+function object ( v, i ) {
+  var b = /^Q\d+$/.test( v )
+  
+  if ( !b )
+    $id( i ).html( v + ' is not a Wikidata ID.' )
+  else
+    d._source.identifiers.wikidata = v
+  
+  return b
 }
 
 function clean ( s ) {

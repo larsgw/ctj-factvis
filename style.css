@@ -82,7 +82,8 @@ body > main > section {
   body > main > section > form { margin: 0;display:none }
   body > main > section > form.active { display:block }
   
-  body > main > section > form .response { margin:1em 0; }
+  body > main > section > form .response,
+  body > main > section > form .error { margin:1em 0; }
 
 body > main > header {
   position:relative;
