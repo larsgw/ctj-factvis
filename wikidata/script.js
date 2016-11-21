@@ -2,14 +2,14 @@ var d
 
 function main () {
   var u = window
-	    .location
-	    .href
-	    
-	    .split( '#' )
-	    .shift()
-	    .split( '?' )
-	    .slice( 1 )
-	    .join( '?' )
+    .location
+    .href
+    
+    .split( '#' )
+    .shift()
+    .split( '?' )
+    .slice( 1 )
+    .join( '?' )
     
      
   d = JSON.parse( decodeURIComponent(escape( atob( u ) )) )
@@ -71,38 +71,107 @@ function get ( o, n ) {
   var r = o
     , a = n.split( '.' )
     , l = a.pop()
-  a.forEach( v => { o[ v ] ? r = o[ v ] : {} } )
-  return r[ l ]
+  console.log(a,l)
+  a.forEach( v => {
+    console.log(r,v)
+    r = !(
+      [ undefined, null ].indexOf( r[ v ] ) > -1
+    ) ?
+      r[ v ]
+    :
+      {}
+  } )
+  var v = r[ l ]
+  console.log(o,r,l,v)
+  return v === undefined ? null : v
 }
 
 function getText ( o, s ) {
   return clean( s )
     .split( '+' )
     .map( v => v.charAt( 0 ) === '$' ? get( o, v.slice( 1 ) ) : v )
+    .map( v => [
+      'string'
+    ].indexOf( typeof v ) > -1 ? v : JSON.stringify( v ) )
     .join( '' )
 }
 
 function check ( e ) {
+  console.log('-'.repeat(10))
+  
   var a1 = e.data( 'load' ).split( ',' )
     , l  = $id( a1.shift() )
-    , q  = getText( d, a1.join( ',' ) )
+    , a2 = getText( d, a1.join( ',' ) ).split( ':' )
+    , t  = a2.shift()
+    , q  = getText( d, a2.join( ':' ) )
   
   load( e, l )
   
-  setTimeout( function do_callback () {
-    var b = false
-      , c = Object.assign( {}, d, { r: { id: q } } )
+  var callback = function ( b, rd ) {
+    //console.log(b,rd)
+    var c = Object.assign( {}, { d: d }, { r: rd } )
       , a = $( e ).data( 'response' ).split( ',' )
       , r = a.shift()
       , s = a.join( ',' ).split( '|' )
       
         s = s[ !b * 1 ] || s[ 0 ]
     
-    $id( r ).html( getText( c, s ) )
+    $id( r )
+      .data( 'response-status', b ? 'ok' : 'ko' )
+      .html( getText( c, s ) )
     
     unload( e, l )
+  }
+  
+  switch ( t ) {
+    case 'PMC':
+      getFile(
+	wdQuery( 'SELECT ?id WHERE{?id wdt:P932"' + q.match( /PMC(\d+)/ )[ 1 ] + '"}' )
+      , function ( b, r ) {
+	  var b = b, r = r
+	  
+	  if ( b && r ) {
+	    if ( r.results.bindings.length )
+	      r = r.results.bindings[ 0 ].id.value.match( /(Q\d+)$/ )[ 1 ]
+	    else b = false, r = null
+	  } else b = false, r = null
+	  
+	  if ( b )
+	    d._source.documentWDID = r
+	  
+	  callback( b, r )
+	}
+      )
+      break;
     
-  }, 1000 )
+    case 'obj':
+    case 'prop':
+    case 'val':
+      //var b = !!JSON.parse( '{"a":' + q + '}' ).a
+      callback( !!q, q )
+      break;
+    
+    default:
+      unload( e, l )
+      break;
+  }
+}
+
+function getFile ( u, c ) {
+  $.get( {
+    url: u
+  , success: function ( d ) { ( c )( true, d ) }
+  } ).fail( function () { ( c )( false, null ) } )
+}
+
+function wdQuery ( q ) {
+  return (
+    'https://query.wikidata.org/sparql?format=json&query=' +
+    encodeURIComponent(
+      '\nPREFIX wd: <http://www.wikidata.org/entity/>\nPREFIX wdt: <http://www.wikidata.org/prop/direct/>\n' +
+      q
+    )
+  )
 }
 
 function loader () {

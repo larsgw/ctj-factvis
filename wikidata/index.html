@@ -25,11 +25,18 @@
       </header>
       <section>
 	<form data-load="s1-l1,
-	  $_source.cprojectID
+	  PMC:$_source.cprojectID
 	" data-response="s1-r1,
-	  $r.id+ exists <a href=''>here</a>. Click <strong>Complete</strong>
+	  $d._source.cprojectID+ exists <a
+	    target='_blank'
+	    href='https://wikidata.org/wiki/+$r+'
+	  >here</a>. Click <strong>Complete</strong>
 	|
-	  The article was not found. <a href=''>Open in SourceMD.</a>
+	  <p>The article was not found. <a
+	    target='_blank'
+	    href='https://tools.wmflabs.org/sourcemd/?id=+$d._source.cprojectID+'
+	  >Open in SourceMD.</a></p>
+	  <button type='button' onclick='goto(1)' class='flat pointer'>Check again</button>
 	">
 	  <h1>Check article</h1>
 	  
@@ -38,50 +45,58 @@
 	  <div id="s1-l1"></div>
 	  <div id="s1-r1" class="response"></div>
 	  
-	  <button type="button" onclick="goto(2)" class="flat pointer">Complete</button>
+	  <button type="button" onclick="if($id('s1-r1').data('response-status')==='ok')goto(2)" class="pointer">Complete</button>
 	  
 	</form>
 	<form data-load="s2-l1,
-	  $_source.identifiers
+	  obj:$_source.identifiers.wikidata
 	" data-response="s2-r1,
-	  $_source.term+ exists <a href=''>here</a>. Click <strong>Complete</strong>
+	  $d._source.term+ exists <a
+	    target='_blank'
+	    href='https://wikidata.org/wiki/+$d._source.identifiers.wikidata+'
+	  >here</a>.
+	  Click <strong>Complete</strong>
 	|
 	  <p>The object has no id. Please enter one:</p>
 	  <p><label><input id='s2-t1' type='text' placeholder='Wikidata ID' /></label></p>
 	">
 	  <h1>Link object</h1>
 	  
-	  <p></p>
+	  <p>This is the object that has the property.</p>
 	  
 	  <div id="s2-l1"></div>
 	  <div id="s2-r1" class="response"></div>
 	  <div id="s2-e1" class="error"></div>
 	  
-	  <button type="button" onclick="if(object($id('s2-t1').val(),'s2-e1'))goto(3)" class="flat pointer">Complete</button>
+	  <button type="button" onclick="
+	  if($id('s2-r1').data('response-status')==='ko'){
+	    if(object($id('s2-t1').val(),'s2-e1'))
+	      goto(3)
+	  }else goto(3)" class="pointer">Complete</button>
 	  
 	</form>
 	<form>
 	  <h1>Link property</h1>
 	  
-	  <button type="button" onclick="goto(4)" class="flat pointer">Complete</button>
+	  <button type="button" onclick="goto(4)" class="pointer">Complete</button>
 	  
 	</form>
 	<form>
 	  <h1>Link value</h1>
 	  
-	  <button type="button" onclick="goto(5)" class="flat pointer">Complete</button>
+	  <button type="button" onclick="goto(5)" class="pointer">Complete</button>
 	  
 	</form>
 	<form>
 	  <h1>Check statement</h1>
 	  
-	  <button type="button" onclick="goto(6)" class="flat pointer">Complete</button>
+	  <button type="button" onclick="goto(6)" class="pointer">Complete</button>
 	  
 	</form>
 	<form>
 	  <h1>Add statement</h1>
 	  
-	  <button type="button" onclick="finish()" class="flat pointer">Complete</button>
+	  <button type="button" onclick="finish()" class="pointer">Complete</button>
 	  
 	</form>
       </section>

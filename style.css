@@ -58,6 +58,13 @@ form {
   background-color:#607D8B;
 }
 
+[type="reset"].flat, [type="button"].flat, [type="submit"].flat, button.flat {
+  color:#607D8B;
+  background-color:transparent;
+  box-shadow:none;
+  border-radius:0;
+}
+
 [disabled] {
   opacity: .5;
   -webkit-pointer-events: none;-moz-pointer-events: none;-ms-pointer-events: none;pointer-events: none;
