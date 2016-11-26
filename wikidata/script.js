@@ -14,24 +14,14 @@ function main () {
      
   d = JSON.parse( decodeURIComponent(escape( atob( u ) )) )
   
-  $( 'body > main > section > form [data-replace]' ).each( ( _, v ) => {
-    v = $( v )
-    v.html( getText( d, v.data( 'replace' ) ) )
-  } )
-  
-  $( 'body > main > section > form [data-attr]' ).each( ( _, v ) => {
-    v = $( v )
-    var i = v.data( 'attr' ).split( ',' )
-    v.attr(
-      i.shift(),
-      getText( d, i.join( ',' ) )
-    )
-  } )
+  $( 'button:not( [type] )' ).click( function () { return false } )
   
   goto( 1 )
 }
 
 function goto ( n ) {
+  console.log('-'.repeat(10),n,'-'.repeat(10))
+  
   var w = $( 'body > main' )
   
   w.find( 'section > form, header li' )
@@ -44,6 +34,20 @@ function goto ( n ) {
             .addClass( 'active' )
 	    .filter( 'form' )
   
+  c.find( '[data-replace]' ).each( ( _, v ) => {
+    v = $( v )
+    v.html( getText( d, v.data( 'replace' ) ) )
+  } )
+  
+  c.find( '[data-attr]' ).each( ( _, v ) => {
+    v = $( v )
+    var i = v.data( 'attr' ).split( ',' )
+    v.attr(
+      i.shift(),
+      getText( d, i.join( ',' ) )
+    )
+  } )
+  
   if ( c.is( '[data-load]' ) )
     check( c )
 }
@@ -52,9 +56,34 @@ function object ( v, i ) {
   var b = /^Q\d+$/.test( v )
   
   if ( !b )
-    $id( i ).html( v + ' is not a Wikidata ID.' )
+    $id( i ).html( '"' + v + '" is not a Wikidata ID.' )
   else
     d._source.identifiers.wikidata = v
+  
+  return b
+}
+
+function property ( v, i ) {
+  var b = /^P\d+$/.test( v )
+  
+  if ( !b )
+    $id( i ).html( '"' + v + '" is not a Wikidata Property ID.' )
+  else
+    d._source.prop.wikidata = v
+  
+  return b
+}
+
+function subject ( v, i ) {
+  var b = /^Q\d+$/.test( v )
+  
+  if ( !b )
+    $id( i ).html( '"' + v + '" is not a Wikidata ID.' )
+  else
+    d._source.value_identifiers = d._source.value_identifiers || {},
+    d._source.value_identifiers.wikidata = v
+  
+  console.log(v,b,i)
   
   return b
 }
@@ -71,9 +100,10 @@ function get ( o, n ) {
   var r = o
     , a = n.split( '.' )
     , l = a.pop()
-  console.log(a,l)
+  
+  console.log(o,n,r,a,l)
+  
   a.forEach( v => {
-    console.log(r,v)
     r = !(
       [ undefined, null ].indexOf( r[ v ] ) > -1
     ) ?
@@ -82,7 +112,6 @@ function get ( o, n ) {
       {}
   } )
   var v = r[ l ]
-  console.log(o,r,l,v)
   return v === undefined ? null : v
 }
 
@@ -97,8 +126,6 @@ function getText ( o, s ) {
 }
 
 function check ( e ) {
-  console.log('-'.repeat(10))
-  
   var a1 = e.data( 'load' ).split( ',' )
     , l  = $id( a1.shift() )
     , a2 = getText( d, a1.join( ',' ) ).split( ':' )
@@ -108,7 +135,6 @@ function check ( e ) {
   load( e, l )
   
   var callback = function ( b, rd ) {
-    //console.log(b,rd)
     var c = Object.assign( {}, { d: d }, { r: rd } )
       , a = $( e ).data( 'response' ).split( ',' )
       , r = a.shift()
@@ -124,6 +150,20 @@ function check ( e ) {
   }
   
   switch ( t ) {
+    case 'quickstatement':
+      
+      var r = [
+        d._source.identifiers.wikidata
+      , d._source.prop.wikidata
+      , d._source.value_identifiers.wikidata
+      , 'S248'
+      , d._source.documentWDID
+      ].join( '\t' )
+      
+      callback( true, r ) 
+      
+      break;
+    
     case 'PMC':
       getFile(
 	wdQuery( 'SELECT ?id WHERE{?id wdt:P932"' + q.match( /PMC(\d+)/ )[ 1 ] + '"}' )
@@ -147,8 +187,15 @@ function check ( e ) {
     case 'obj':
     case 'prop':
     case 'val':
-      //var b = !!JSON.parse( '{"a":' + q + '}' ).a
-      callback( !!q, q )
+      var b;
+      
+      try {
+        b = !!JSON.parse( '{"a":' + q + '}' ).a
+      } catch ( e ) {
+        b = q
+      }
+      
+      callback( !!b, b )
       break;
     
     default:
