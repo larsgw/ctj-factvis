@@ -2,7 +2,7 @@ var table
   , hash  = getHash()
   
   , colormap = {}
-  , column= [ 'pmid', 'term', 'prop', 'value', 'wdid', 'ftid' ]
+  , column= [ 'wdhref', 'pmid', 'term', 'prop', 'value', 'ftid' ]
   , desc  = {
     pmid: function (title) {return(
       '<strong>' + title + '</strong> is an article identifier issued by <a href="https://www.ncbi.nlm.nih.gov/pmc/">Pubmed Central</a>. '+
@@ -48,29 +48,30 @@ function checkHash() {
     .columns().search( '' )
   
   if ( hash.val ) {
-      index = column.indexOf( hash.key )
+      index = [ column.indexOf( hash.key ) ]
     , value = hash.val
     
     if (title&&desc.hasOwnProperty(hash.key)) text = desc[ hash.key ]( title )
   } else if ( hash.key ) {
     if ( /^PMC\d+$/.test( hash.key ) ) {
-      index = column.indexOf( 'pmid' )
+      index = [ column.indexOf( 'pmid' ) ]
     , value = hash.key
     
       if ( title ) text = desc[ 'pmid' ]( title )
     } else if ( /^Q\d+$/.test( hash.key ) ) {
-      index = column.indexOf( 'wdid' )
+      index = [ 2, 3, 4 ]
     , value = hash.key
     
       if ( title ) text = desc[ 'wdid' ]( title )
     } else {
       columns = false
-      table.columns( 1, 2, 3 ).search( hash.key )
+    , index = [ 2, 3, 4 ]
+    , value = hash.key
     }
   }
   
   if ( columns )
-    table.column( index ).search( value )
+    table.column.apply( undefined, index ).search( value )
   
   if ( title&&text ) {
     $('#desc-title').html(title)
@@ -82,7 +83,6 @@ function checkHash() {
 }
 
 function loadFile(num) {
-  console.log(num)
   $.get('sample/sample_'+(num||1)+'.json', function CB_loadDefault(file) {
     receivedText(file)
   }).fail((err) => {
@@ -128,12 +128,24 @@ function receivedText(e) {
   $('#front-loading-matter').css('display', 'none')
 
   newArr.forEach( function CB_eachFact(value, index) {
-    if(value._source.term==='Larix olgensis')console.log(value)
     html +=
     '<tr>' +
+      '<td class="wdhref"><a class="m-i-b" title="Add to Wikidata" href="wikidata?' +
+	btoa( unescape(encodeURIComponent( JSON.stringify( value ) )) ) +
+      '"></td>' +
+      
       '<td class="pmid"><span><a href="#pmid='+value._source.cprojectID+'">'+ value._source.cprojectID+'</td>' +
       
-      '<td class="term"><span>' + value._source.term + '</td>' +
+      '<td class="term"><span>' +
+	( typeof value._source.identifiers.wikidata === 'string' ?
+	  '<a class="wdid" href="#' + value._source.identifiers.wikidata + '">' +
+	    value._source.term +
+	    '<span>' + value._source.identifiers.wikidata + '</span>' +
+	  '</a>'
+	:
+	  value._source.term
+	) +
+      '</span></td>' +
       
       '<td class="prop"><span>' +
 	value._source.prop.name +
@@ -146,16 +158,6 @@ function receivedText(e) {
 	( value._source.prop.unit ? value._source.prop.unit : '' ) +
       '">' + value._source.value + '</td>' +
       
-      '<td class="wdid"><span>' +
-	( typeof value._source.identifiers.wikidata === 'string' ?
-	  '<a href="#wdid=' + value._source.identifiers.wikidata + '">' +
-	  value._source.identifiers.wikidata +
-	  '</a>'
-	:
-	  ''
-	) +
-      '</span></td>' +
-      
       '<td class="ftid"><span>'+ factID(value._id) +'</td>' +
     '</tr>';
   })
@@ -167,13 +169,13 @@ function receivedText(e) {
   } else {
     table = $('#mytable').DataTable( {
       ordering  : true
-    , order     : [ [ 0, 'asc' ], [ 5, 'asc' ] ]
+    , order     : [ [ 1, 'asc' ], [ 5, 'asc' ] ]
     , autoWidth : false
     , columnDefs: [
-	{ targets: 0, width: '110px' }
-      , { targets: 1, width: '200px' }
-      , { targets: 2, width: '160px' }
-      , { targets: 4, width: '100px' }
+	{ targets: 0, width:  '56px' }
+      , { targets: 1, width: '110px' }
+      , { targets: 2, width: '220px' }
+      , { targets: 3, width: '160px' }
       ]
     , search: {
 	caseInsensitive: false

@@ -1,0 +1,191 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Adding WikiData Statement</title>
+    
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&subset=latin,greek,latin-ext' rel='stylesheet' type='text/css'>
+    
+    <link href="../style.css" rel="stylesheet">
+  </head>
+  <body onload="main()">
+    <header></header>
+    
+    <main>
+      <header>
+	<nav>
+	  <ol>
+	    <li>Check article</li>
+	    <li>Link object</li>
+	    <li>Link property</li>
+	    <li>Link value</li>
+	    <li>Check statement</li>
+	    <li>Add statement</li>
+	  </ol>
+	</nav>
+      </header>
+      <section>
+	<form data-load="s1-l1,
+	  PMC:$_source.cprojectID
+	" data-response="s1-r1,
+	  $d._source.cprojectID+ exists <a
+	    target='_blank'
+	    href='https://wikidata.org/wiki/+$r+'
+	  >here</a>. Click <strong>Complete</strong>
+	|
+	  <p>The article was not found. <a
+	    target='_blank'
+	    href='https://tools.wmflabs.org/sourcemd/?id=+$d._source.cprojectID+'
+	  >Open in SourceMD.</a></p>
+	  <button type='button' onclick='goto(1)' class='flat pointer'>Check again</button>
+	">
+	  <h1>Check article</h1>
+	  
+	  <p>To add a statement to Wikidata, you need a reference. This is easy when the article the statement exists in Wikidata.</p>
+	  
+	  <div id="s1-l1"></div>
+	  <div id="s1-r1" class="response"></div>
+	  
+	  <button onclick="if($id('s1-r1').data('response-status')==='ok')goto(2)" class="pointer">Complete</button>
+	  
+	</form>
+	<form data-load="s2-l1,
+	  obj:$_source.identifiers.wikidata
+	" data-response="s2-r1,
+	  $d._source.term+ exists <a
+	    target='_blank'
+	    href='https://wikidata.org/wiki/+$d._source.identifiers.wikidata+'
+	  >here</a>.
+	  Click <strong>Complete</strong>
+	|
+	  <p>The object has no id. Please enter one:</p>
+	  <fieldset><label><input id='s2-t1' type='text' /><legend>Wikidata ID</legend></label></fieldset>
+	">
+	  <h1>Link object</h1>
+	  
+	  <p>This is the object that has the property.</p>
+	  
+	  <div id="s2-l1"></div>
+	  <div id="s2-r1" class="response"></div>
+	  <div id="s2-e1" class="error"></div>
+	  
+	  <button onclick="
+	  if($id('s2-r1').data('response-status')==='ko'){
+	    if(object($id('s2-t1').val(),'s2-e1'))
+	      goto(3)
+	  }else goto(3)" class="pointer">Complete</button>
+	  
+	</form>
+	<form data-load="s3-l1,
+          prop:$_source.prop.wikidata
+        " data-response="s3-r1,
+          $d._source.prop+ exists <a
+            target='_blank'
+            href='https://wikidata.org/wiki/+$d._source.prop.wikidata+'
+          >here</a>.
+          Click <strong>Complete</strong>
+        |
+          <p>The object has no id. Please enter one:</p>
+          <fieldset><label><input
+            value='P1'
+            id='s3-t1'
+            type='text'
+          /><legend>Wikidata Prop ID</legend></label></fieldset>
+        ">
+	  <h1>Link property</h1>
+	  
+          <div id="s3-l1"></div>
+          <div id="s3-r1" class="response"></div>
+          <div id="s3-e1" class="error"></div>
+          
+	  <button onclick="
+          if($id('s3-r1').data('response-status')==='ko'){
+            if(property($id('s3-t1').val(),'s3-e1'))
+              goto(4)
+          }else goto(4)" class="pointer">Complete</button>
+	  
+	</form>
+	<form data-load="s4-l1,
+          val:$_source.value_identifiers.wikidata
+        " data-response="s4-r1,
+          $d._source.value+ exists <a
+            target='_blank'
+            href='https://wikidata.org/wiki/+$d._source.value_identifiers.wikidata+'
+          >here</a>.
+          Click <strong>Complete</strong>
+        |
+          <p>The object has no id. Please enter one:</p>
+          <fieldset><label><input
+            value='Q1'
+            id='s4-t1'
+            type='text'
+          /><legend>Wikidata ID</legend></label></fieldset>
+        ">
+	  <h1>Link value</h1>
+          
+          <div id="s4-l1"></div>
+          <div id="s4-r1" class="response"></div>
+          <div id="s4-e1" class="error"></div>
+	  
+	  <button onclick="
+          if($id('s4-r1').data('response-status')==='ko'){
+            if(subject($id('s4-t1').val(),'s4-e1'))
+              goto(5)
+          }else goto(5)" class="pointer">Complete</button>
+	  
+	</form>
+	<form>
+	  <h1>Check statement</h1>
+	  
+	  <div data-replace="
+            <table>
+              <thead>
+                <tr>
+                  <td>Document</td>
+                  <td>Object</td>
+                  <td>Property</td>
+                  <td>Value</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>+$_source.cprojectID+</td>
+                  <td>+$_source.term+</td>
+                  <td>+$_source.prop.name+</td>
+                  <td>+$_source.value+</td>
+                </tr>
+                <tr>
+                  <td><a target='_blank' href='https://wikidata.org/wiki/+$_source.documentWDID+'>+$_source.documentWDID+</a></td>
+                  <td><a target='_blank' href='https://wikidata.org/wiki/+$_source.identifiers.wikidata+'>+$_source.identifiers.wikidata+</a></td>
+                  <td><a target='_blank' href='https://wikidata.org/wiki/Property:+$_source.prop.wikidata+'>+$_source.prop.wikidata+</a></td>
+                  <td><a target='_blank' href='https://wikidata.org/wiki/+$_source.value_identifiers.wikidata+'>+$_source.value_identifiers.wikidata+</a></td>
+                </tr>
+              </tbody>
+            </table>
+	  "></div>
+	  
+	  <p>Please <strong>Check</strong> if this statement already exists<br>
+	  <a type="button" target="_blank" data-attr="href,
+	  https://wikidata.org/wiki/+$_source.identifiers.wikidata+#+$_source.prop.wikidata">Check</a></p>
+	  
+	  <button onclick="goto(6)" class="pointer">Complete</button>
+	  
+	</form>
+	<form target="_blank" data-load="s6-l1,quickstatement:" action="https://tools.wmflabs.org/wikidata-todo/quick_statements.php" method="POST" data-response="s6-r1,$r">
+	  
+	  <h1>Add statement</h1>
+	  
+	  <div>
+            <div id="s6-l1"></div>
+            <textarea name="list" id="s6-r1"></textarea>
+          </div>
+	  
+	  <button name="doit" type="submit" class="pointer">Complete</button>
+	  
+	</form>
+      </section>
+    </main>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
