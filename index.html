@@ -11,7 +11,7 @@
     <link href="bower_components/bootstrap-css/css/bootstrap.min.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
   </head>
-  <body>
+  <body onload="$('button:not([type])').click(function(){return false})">
     <header>
       <div id="backButton" onclick="clearFilter()">
 	<span class="material-icons">arrow_back</span>
@@ -35,9 +35,9 @@
 	<form id="jsonFile" name="jsonFile" enctype="multipart/form-data" method="post">
 	  <fieldset>
 	    <legend>Load a sample set:</legend>
-	    <input type='button' id='btnLoad' value='Load sample file 1' onclick='loadFile(1);' class="btn btn-primary"><br>
-	    <input type='button' id='btnLoad' value='Load sample file 2' onclick='loadFile(2);' class="btn btn-primary"><br>
-	    <input type='button' id='btnLoad' value='Load sample file 3' onclick='loadFile(3);' class="btn btn-primary">
+	    <button id='btnLoad' onclick='loadFile(1);'>Load sample file 1</button><br>
+	    <button id='btnLoad' onclick='loadFile(2);'>Load sample file 2</button><br>
+	    <button id='btnLoad' onclick='loadFile(3);'>Load sample file 3</button>
 	  </fieldset>
 	</form>
       </div>

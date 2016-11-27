@@ -62,7 +62,10 @@
 	">
 	  <h1>Link object</h1>
 	  
-	  <p>This is the object that has the property.</p>
+	  <p>
+            This is the object that has the property.
+            Object text is "<span data-replace="$_source.term"></span>".
+	  </p>
 	  
 	  <div id="s2-l1"></div>
 	  <div id="s2-r1" class="response"></div>
@@ -86,12 +89,16 @@
         |
           <p>The object has no id. Please enter one:</p>
           <fieldset><label><input
-            value='P1'
             id='s3-t1'
             type='text'
           /><legend>Wikidata Prop ID</legend></label></fieldset>
         ">
 	  <h1>Link property</h1>
+          
+          <p>
+            This is the property.
+            Property text is "<span data-replace="$_source.prop.name"></span>".
+          </p>
 	  
           <div id="s3-l1"></div>
           <div id="s3-r1" class="response"></div>
@@ -115,12 +122,16 @@
         |
           <p>The object has no id. Please enter one:</p>
           <fieldset><label><input
-            value='Q1'
             id='s4-t1'
             type='text'
           /><legend>Wikidata ID</legend></label></fieldset>
         ">
 	  <h1>Link value</h1>
+          
+          <p>
+            This is the value.
+            Value text is "<span data-replace="$_source.value"></span>".
+          </p>
           
           <div id="s4-l1"></div>
           <div id="s4-r1" class="response"></div>
